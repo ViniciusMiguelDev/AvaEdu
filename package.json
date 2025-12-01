@@ -1,0 +1,19 @@
+{
+  "name": "avaedu",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "qa": "node qa-agent/actions/parse_prd.js && node qa-agent/actions/classify_criteria.js && node qa-agent/actions/generate_nunit_tests.js && dotnet test AvaEdu.csproj --logger \"trx;LogFileName=TestResult.trx\" --results-directory ./reports && node qa-agent/actions/report_results.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "description": "",
+  "dependencies": {
+    "agentvibes": "^2.14.11",
+    "glob": "^13.0.0",
+    "xml2js": "^0.6.2"
+  }
+}

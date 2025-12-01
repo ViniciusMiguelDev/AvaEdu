@@ -186,7 +186,7 @@ namespace AvaEdu.Services
             ValidarCampoTextoNaoAlterado(target, preImage, OcorrenciaConstants.FieldCpf, "CPF");
             ValidarCampoReferenciaOuOptionSetNaoAlterado(target, preImage);
 
-            throw new InvalidPluginExecutionException("Ocorrência fechada não pode ser editada.");
+            throw new InvalidPluginExecutionException("Ocorrência fechada não pode ser alterada.");
         }
 
         /// <summary>
@@ -202,7 +202,7 @@ namespace AvaEdu.Services
                 if (!string.Equals(valorOriginal, valorNovo, StringComparison.OrdinalIgnoreCase))
                 {
                     throw new InvalidPluginExecutionException(
-                        $"Ocorrência fechada não pode ter o {fieldLabel} alterado.");
+                        $"Ocorrência fechada não pode ser alterada.");
                 }
             }
         }
@@ -219,7 +219,7 @@ namespace AvaEdu.Services
                 
                 if (tipoOriginal?.Id != tipoNovo?.Id)
                 {
-                    throw new InvalidPluginExecutionException("Ocorrência fechada não pode ter o Tipo alterado.");
+                    throw new InvalidPluginExecutionException("Ocorrência fechada não pode ser alterada.");
                 }
             }
 
@@ -230,7 +230,7 @@ namespace AvaEdu.Services
                 
                 if (assuntoOriginal?.Value != assuntoNovo?.Value)
                 {
-                    throw new InvalidPluginExecutionException("Ocorrência fechada não pode ter o Assunto alterado.");
+                    throw new InvalidPluginExecutionException("Ocorrência fechada não pode ser alterada.");
                 }
             }
         }

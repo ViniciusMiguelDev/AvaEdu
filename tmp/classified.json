@@ -1,0 +1,122 @@
+[
+  {
+    "id": 0,
+    "text": "[Test scenario 1]",
+    "type": "generic"
+  },
+  {
+    "id": 1,
+    "text": "[Test scenario 2]",
+    "type": "generic"
+  },
+  {
+    "id": 2,
+    "text": "[Edge case 1]",
+    "type": "generic"
+  },
+  {
+    "id": 3,
+    "text": "[Edge case 2]",
+    "type": "generic"
+  },
+  {
+    "id": 4,
+    "text": "[Error condition 1]",
+    "type": "generic"
+  },
+  {
+    "id": 5,
+    "text": "[Error condition 2]",
+    "type": "generic"
+  },
+  {
+    "id": 6,
+    "text": "**Action:** [Specific action item]",
+    "type": "generic"
+  },
+  {
+    "id": 7,
+    "text": "**Action:** [Specific action item]",
+    "type": "generic"
+  },
+  {
+    "id": 8,
+    "text": "**Action:** [Specific action item]",
+    "type": "generic"
+  },
+  {
+    "id": 9,
+    "text": "**Action:** [Specific action item]",
+    "type": "generic"
+  },
+  {
+    "id": 10,
+    "text": "**Experiment:** [Description]",
+    "type": "generic"
+  },
+  {
+    "id": 11,
+    "text": "**Experiment:** [Description]",
+    "type": "generic"
+  },
+  {
+    "id": 12,
+    "text": "Ao criar uma ocorrência com CPF, Tipo e Assunto válidos, o sistema deve preencher automaticamente a **data de criação**.",
+    "type": "ocorrencia_create_data"
+  },
+  {
+    "id": 13,
+    "text": "Ao criar uma ocorrência com CPF, Tipo e Assunto válidos, o sistema deve calcular a **data de expiração** somando o prazo de resposta (em horas) configurado no tipo de ocorrência à data de criação.",
+    "type": "ocorrencia_create_data"
+  },
+  {
+    "id": 14,
+    "text": "Se o tipo de ocorrência **não tiver prazo configurado**, o sistema deve usar o prazo padrão de `24 horas` para calcular a data de expiração.",
+    "type": "ocorrencia_expiracao_prazo_tipo"
+  },
+  {
+    "id": 15,
+    "text": "Se já existir uma ocorrência **aberta** para o mesmo CPF, Tipo e Assunto, o sistema deve **impedir a criação** e lançar uma exceção indicando duplicidade.",
+    "type": "ocorrencia_duplicidade"
+  },
+  {
+    "id": 16,
+    "text": "Se o CPF **não for informado**, o sistema **não deve** verificar duplicidade.",
+    "type": "ocorrencia_duplicidade"
+  },
+  {
+    "id": 17,
+    "text": "Se o Tipo **não for informado**, o sistema **não deve** verificar duplicidade.",
+    "type": "ocorrencia_duplicidade"
+  },
+  {
+    "id": 18,
+    "text": "Se o Assunto **não for informado**, o sistema **não deve** verificar duplicidade.",
+    "type": "ocorrencia_duplicidade"
+  },
+  {
+    "id": 19,
+    "text": "Se a ocorrência estiver com status **Fechado**, qualquer tentativa de alteração em `Nome`, `Email`, `Descrição` ou `CPF` deve ser impedida, lançando exceção.",
+    "type": "generic"
+  },
+  {
+    "id": 20,
+    "text": "Se a ocorrência estiver com status **Fechado**, qualquer tentativa de alteração de `Tipo` ou `Assunto` deve ser impedida, lançando exceção.",
+    "type": "generic"
+  },
+  {
+    "id": 21,
+    "text": "Quando o status da ocorrência for alterado para **Fechado** e ainda não houver data de conclusão, o sistema deve preencher automaticamente a **data de conclusão** com a data/hora atual.",
+    "type": "ocorrencia_data_conclusao"
+  },
+  {
+    "id": 22,
+    "text": "Quando o Tipo de ocorrência for alterado em uma ocorrência **Aberta**, o sistema deve **recalcular a data de expiração** com base no prazo do novo tipo, mantendo a data de criação original como base do cálculo.",
+    "type": "ocorrencia_create_data"
+  },
+  {
+    "id": 23,
+    "text": "Se a ocorrência estiver com status **Fechado**, o sistema deve **impedir a exclusão** e lançar exceção apropriada.",
+    "type": "ocorrencia_exclusao_fechada"
+  }
+]

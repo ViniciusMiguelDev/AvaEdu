@@ -1,0 +1,24 @@
+name: qa-agent
+description: QA Agent (BMAD) - gera e executa testes NUnit
+version: 1.0.0
+inputs:
+  prd_glob: "BMAD/docs/sprint-artifacts/*.md"
+  baseUrl: "http://localhost:5000"
+  tests_output: "Tests/Generated"
+  reports_path: "reports/qa"
+steps:
+  - name: extract_criteria
+    run: "node actions/parse_prd.js"
+  - name: classify_criteria
+    run: "node actions/classify_criteria.js"
+  - name: generate_nunit_tests
+    run: "node actions/generate_nunit_tests.js"
+  - name: run_nunit
+    run: "node actions/run_nunit.js"
+  - name: report_results
+    run: "node actions/report_results.js"
+triggers:
+  - on: pull_request
+  - on: push
+outputs:
+  report_path: "{{reports_path}}/qa-report-{{timestamp}}.json"
