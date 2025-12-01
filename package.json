@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "qa": "node qa-agent/actions/parse_prd.js && node qa-agent/actions/classify_criteria.js && node qa-agent/actions/generate_nunit_tests.js && dotnet test AvaEdu.csproj --logger \"trx;LogFileName=TestResult.trx\" --results-directory ./reports && node qa-agent/actions/report_results.js"
-  },
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "qa": "node qa-agent/actions/parse_prd.js && node qa-agent/actions/classify_criteria.js && node qa-agent/actions/generate_nunit_tests.js && dotnet test AvaEdu.csproj --logger \"trx;LogFileName=TestResult.trx\" --results-directory ./reports && node qa-agent/actions/report_results.js",
+  "qa-agent": "node agents/run-agent.js"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",

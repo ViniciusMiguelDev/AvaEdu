@@ -1,131 +1,105 @@
 using System;
-using FakeXrmEasy;
+using System.Collections.Generic;
+using AvaEdu.Constants;
+using AvaEdu.Repositories;
+using AvaEdu.Services;
 using Microsoft.Xrm.Sdk;
+using FakeXrmEasy;
 
 namespace AvaEdu.Tests
 {
-    internal interface ICrmTestContext
+    public class CrmTestContext
     {
-        IOrganizationService Service { get; }
-        void Seed(params Entity[] entities);
-        IPluginExecutionContext CreatePluginContext(string messageName, object target, Guid? primaryId = null);
-    }
-
-    internal class CrmTestContext : ICrmTestContext
-    {
-        private readonly XrmFakedContext _inner = new XrmFakedContext();
-        public IOrganizationService Service { get; }
+        private readonly XrmFakedContext _context;
+        public IOrganizationService Service => _context.GetOrganizationService();
 
         public CrmTestContext()
         {
-            Service = _inner.GetOrganizationService();
+            _context = new XrmFakedContext();
         }
 
-        public Entity BuildOcorrenciaBasica(string cpf, int assunto)
-        {
-            var ent = new Entity(AvaEdu.Constants.OcorrenciaConstants.EntityLogicalName) { Id = Guid.NewGuid() };
-            ent[AvaEdu.Constants.OcorrenciaConstants.FieldCpf] = cpf;
-            ent[AvaEdu.Constants.OcorrenciaConstants.FieldAssunto] = new OptionSetValue(assunto);
-            ent[AvaEdu.Constants.OcorrenciaConstants.FieldTipo] = new EntityReference(AvaEdu.Constants.OcorrenciaConstants.TipoEntityLogicalName, Guid.NewGuid());
-            return ent;
-        }
-
-        public (AvaEdu.Services.OcorrenciaService Service, Entity Ocorrencia, IPluginExecutionContext PluginContext, IOrganizationService OrganizationService) SetupTipoOcorrenciaComPrazo(int prazoHoras)
+        public Entity BuildOcorrenciaBasica(string cpf, int prazoHoras)
         {
             var tipoId = Guid.NewGuid();
-            var tipo = new Entity(AvaEdu.Constants.OcorrenciaConstants.TipoEntityLogicalName) { Id = tipoId };
-            tipo[AvaEdu.Constants.OcorrenciaConstants.FieldTipoPrazoRespostaHoras] = prazoHoras;
+            var tipo = new Entity(OcorrenciaConstants.TipoEntityLogicalName) { Id = tipoId };
+            tipo[OcorrenciaConstants.FieldTipoPrazoRespostaHoras] = prazoHoras;
+            _context.Initialize(new List<Entity> { tipo });
 
-            var ocorrencia = new Entity(AvaEdu.Constants.OcorrenciaConstants.EntityLogicalName) { Id = Guid.NewGuid() };
-            ocorrencia[AvaEdu.Constants.OcorrenciaConstants.FieldTipo] = new EntityReference(AvaEdu.Constants.OcorrenciaConstants.TipoEntityLogicalName, tipoId);
-            ocorrencia[AvaEdu.Constants.OcorrenciaConstants.FieldCpf] = "12345678900";
-            ocorrencia[AvaEdu.Constants.OcorrenciaConstants.FieldAssunto] = new OptionSetValue(1);
-
-            _inner.Initialize(new[] { tipo });
-
-            var repo = new AvaEdu.Repositories.OcorrenciaRepository();
-            var svc = new AvaEdu.Services.OcorrenciaService(repo);
-            var pluginCtx = CreatePluginContext("Create", ocorrencia);
-
-            return (svc, ocorrencia, pluginCtx, Service);
+            var ocorr = new Entity(OcorrenciaConstants.EntityLogicalName);
+            ocorr[OcorrenciaConstants.FieldCpf] = cpf;
+            ocorr[OcorrenciaConstants.FieldTipo] = new EntityReference(OcorrenciaConstants.TipoEntityLogicalName, tipoId);
+            ocorr[OcorrenciaConstants.FieldAssunto] = new OptionSetValue(1);
+            ocorr[OcorrenciaConstants.FieldStatus] = new OptionSetValue(OcorrenciaConstants.StatusAberto);
+            return ocorr;
         }
 
-        public (AvaEdu.Services.OcorrenciaService Service, Entity Ocorrencia, IPluginExecutionContext PluginContext, IOrganizationService OrganizationService) SetupTipoOcorrenciaSemPrazo()
+        public IPluginExecutionContext CreatePluginContext(string messageName, Entity target)
         {
-            var tipoId = Guid.NewGuid();
-            var tipo = new Entity(AvaEdu.Constants.OcorrenciaConstants.TipoEntityLogicalName) { Id = tipoId };
-
-            var ocorrencia = new Entity(AvaEdu.Constants.OcorrenciaConstants.EntityLogicalName) { Id = Guid.NewGuid() };
-            ocorrencia[AvaEdu.Constants.OcorrenciaConstants.FieldTipo] = new EntityReference(AvaEdu.Constants.OcorrenciaConstants.TipoEntityLogicalName, tipoId);
-            ocorrencia[AvaEdu.Constants.OcorrenciaConstants.FieldCpf] = "99999999999";
-            ocorrencia[AvaEdu.Constants.OcorrenciaConstants.FieldAssunto] = new OptionSetValue(3);
-
-            _inner.Initialize(new[] { tipo });
-
-            var repo = new AvaEdu.Repositories.OcorrenciaRepository();
-            var svc = new AvaEdu.Services.OcorrenciaService(repo);
-            var pluginCtx = CreatePluginContext("Create", ocorrencia);
-
-            return (svc, ocorrencia, pluginCtx, Service);
-        }
-
-        public (AvaEdu.Services.OcorrenciaService Service, IPluginExecutionContext PluginContext, IOrganizationService OrganizationService) SetupOcorrenciaDuplicada()
-        {
-            var tipoId = Guid.NewGuid();
-            var tipo = new Entity(AvaEdu.Constants.OcorrenciaConstants.TipoEntityLogicalName) { Id = tipoId };
-            tipo[AvaEdu.Constants.OcorrenciaConstants.FieldTipoPrazoRespostaHoras] = 5;
-
-            var existente = new Entity(AvaEdu.Constants.OcorrenciaConstants.EntityLogicalName) { Id = Guid.NewGuid() };
-            existente[AvaEdu.Constants.OcorrenciaConstants.FieldCpf] = "11111111111";
-            existente[AvaEdu.Constants.OcorrenciaConstants.FieldTipo] = new EntityReference(AvaEdu.Constants.OcorrenciaConstants.TipoEntityLogicalName, tipoId);
-            existente[AvaEdu.Constants.OcorrenciaConstants.FieldAssunto] = new OptionSetValue(5);
-            existente[AvaEdu.Constants.OcorrenciaConstants.FieldStatus] = new OptionSetValue(AvaEdu.Constants.OcorrenciaConstants.StatusAberto);
-
-            _inner.Initialize(new Entity[] { tipo, existente });
-
-            var nova = new Entity(AvaEdu.Constants.OcorrenciaConstants.EntityLogicalName) { Id = Guid.NewGuid() };
-            nova[AvaEdu.Constants.OcorrenciaConstants.FieldCpf] = "11111111111";
-            nova[AvaEdu.Constants.OcorrenciaConstants.FieldTipo] = new EntityReference(AvaEdu.Constants.OcorrenciaConstants.TipoEntityLogicalName, tipoId);
-            nova[AvaEdu.Constants.OcorrenciaConstants.FieldAssunto] = new OptionSetValue(5);
-
-            var repo = new AvaEdu.Repositories.OcorrenciaRepository();
-            var svc = new AvaEdu.Services.OcorrenciaService(repo);
-            var pluginCtx = CreatePluginContext("Create", nova);
-
-            return (svc, pluginCtx, Service);
-        }
-
-        public void Seed(params Entity[] entities)
-        {
-            if (entities != null && entities.Length > 0)
+            var pluginContext = _context.GetDefaultPluginContext();
+            pluginContext.MessageName = messageName;
+            if (!pluginContext.InputParameters.Contains("Target"))
             {
-                _inner.Initialize(entities);
+                pluginContext.InputParameters.Add("Target", target);
             }
+            else
+            {
+                pluginContext.InputParameters["Target"] = target;
+            }
+            return pluginContext;
         }
 
-        public IPluginExecutionContext CreatePluginContext(string messageName, object target, Guid? primaryId = null)
+        public SetupResult SetupOcorrenciaDuplicada()
         {
-            var ctx = _inner.GetDefaultPluginContext();
-            ctx.InputParameters.Clear();
-            if (target != null)
+            var tipoId = Guid.NewGuid();
+            var tipo = new Entity(OcorrenciaConstants.TipoEntityLogicalName) { Id = tipoId };
+            var existing = new Entity(OcorrenciaConstants.EntityLogicalName) { Id = Guid.NewGuid() };
+            existing[OcorrenciaConstants.FieldCpf] = "12345678901";
+            existing[OcorrenciaConstants.FieldTipo] = new EntityReference(OcorrenciaConstants.TipoEntityLogicalName, tipoId);
+            existing[OcorrenciaConstants.FieldAssunto] = new OptionSetValue(1);
+            existing[OcorrenciaConstants.FieldStatus] = new OptionSetValue(OcorrenciaConstants.StatusAberto);
+            _context.Initialize(new List<Entity> { tipo, existing });
+
+            var newEntity = new Entity(OcorrenciaConstants.EntityLogicalName);
+            newEntity[OcorrenciaConstants.FieldCpf] = "12345678901";
+            newEntity[OcorrenciaConstants.FieldTipo] = new EntityReference(OcorrenciaConstants.TipoEntityLogicalName, tipoId);
+            newEntity[OcorrenciaConstants.FieldAssunto] = new OptionSetValue(1);
+            newEntity[OcorrenciaConstants.FieldStatus] = new OptionSetValue(OcorrenciaConstants.StatusAberto);
+
+            var pluginContext = CreatePluginContext("Create", newEntity);
+            var repo = new OcorrenciaRepository();
+            var ocorrService = new OcorrenciaService(repo);
+
+            return new SetupResult
             {
-                if (target is Entity e)
-                {
-                    if (primaryId.HasValue && primaryId.Value != Guid.Empty)
-                    {
-                        e.Id = primaryId.Value;
-                    }
-                    ctx.InputParameters["Target"] = e;
-                    ((XrmFakedPluginExecutionContext)ctx).PrimaryEntityId = e.Id;
-                }
-                else if (target is EntityReference er)
-                {
-                    ctx.InputParameters["Target"] = er;
-                    ((XrmFakedPluginExecutionContext)ctx).PrimaryEntityId = er.Id;
-                }
-            }
-            ((XrmFakedPluginExecutionContext)ctx).MessageName = messageName;
-            return ctx;
+                Service = ocorrService,
+                PluginContext = pluginContext,
+                OrganizationService = Service,
+                Ocorrencia = newEntity
+            };
         }
+
+        public SetupResult SetupTipoOcorrenciaComPrazo(int horas)
+        {
+            var ocorr = BuildOcorrenciaBasica("12345678901", horas);
+            var pluginContext = CreatePluginContext("Create", ocorr);
+            var repo = new OcorrenciaRepository();
+            var ocorrService = new OcorrenciaService(repo);
+
+            return new SetupResult
+            {
+                Service = ocorrService,
+                PluginContext = pluginContext,
+                OrganizationService = Service,
+                Ocorrencia = ocorr
+            };
+        }
+    }
+
+    public class SetupResult
+    {
+        public OcorrenciaService Service { get; set; }
+        public IPluginExecutionContext PluginContext { get; set; }
+        public IOrganizationService OrganizationService { get; set; }
+        public Entity Ocorrencia { get; set; }
     }
 }

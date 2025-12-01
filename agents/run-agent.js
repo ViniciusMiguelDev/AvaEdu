@@ -1,29 +1,18 @@
-import * as AgentVibes from "agentvibes";
-import fs from "fs";
-import path from "path";
-import readline from "readline";
+import { spawn } from "child_process";
 
-const agentConfigPath = path.resolve("qa-agent/qa-agent-config.md");
+console.log("🤖 QA Agent iniciado! Rodando pipeline de testes QA...\n");
 
-// Carrega instruções do agente
-const config = fs.readFileSync(agentConfigPath, "utf8");
-
-// Inicializa o agente
-const agent = new AgentVibes({
-    name: "QA-Agent",
-    instructions: config,
+// Executa o mesmo pipeline do script npm "qa"
+const qaProcess = spawn("npm", ["run", "qa"], {
+    shell: true,
+    stdio: "inherit",
 });
 
-// Configura CLI interativo
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
+qaProcess.on("exit", (code) => {
+    if (code === 0) {
+        console.log("\n✅ Pipeline QA concluído com sucesso.");
+    } else {
+        console.error(`\n❌ Pipeline QA terminou com código ${code}.`);
+    }
 });
 
-console.log("🤖 QA Agent iniciado! Digite sua pergunta abaixo:");
-
-rl.on("line", async (input) => {
-    const response = await agent.run(input);
-    console.log("\n" + response + "\n");
-    console.log("Digite outra pergunta:");
-});
