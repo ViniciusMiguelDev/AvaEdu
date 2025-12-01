@@ -1,4 +1,4 @@
-import AgentVibes from "agentvibes";
+import * as AgentVibes from "agentvibes";
 import fs from "fs";
 import path from "path";
 import readline from "readline";
