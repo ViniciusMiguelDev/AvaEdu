@@ -13,11 +13,13 @@ namespace AvaEdu.Tests
         private readonly XrmFakedContext _context;
         public IOrganizationService Service => _context.GetOrganizationService();
 
+        [Obsolete]
         public CrmTestContext()
         {
             _context = new XrmFakedContext();
         }
 
+        [Obsolete]
         public Entity BuildOcorrenciaBasica(string cpf, int prazoHoras)
         {
             var tipoId = Guid.NewGuid();
@@ -48,6 +50,7 @@ namespace AvaEdu.Tests
             return pluginContext;
         }
 
+        [Obsolete]
         public SetupResult SetupOcorrenciaDuplicada()
         {
             var tipoId = Guid.NewGuid();
@@ -78,6 +81,7 @@ namespace AvaEdu.Tests
             };
         }
 
+        [Obsolete]
         public SetupResult SetupTipoOcorrenciaComPrazo(int horas)
         {
             var ocorr = BuildOcorrenciaBasica("12345678901", horas);
